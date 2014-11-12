@@ -1,0 +1,8 @@
+
+ * Master (base) file picking logic (file w/ largest link count?)
+ * Report if not all of the hardlinks were picked, and perhaps pick the master
+   (base) file based on this as well.
+ * minage: actually do the math for leapyears, daylight changes, months 30,31,28.
+ * add parallelism
+ * openssl ENGINE support?
+

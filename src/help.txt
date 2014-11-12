@@ -1,0 +1,136 @@
+Usage: fsunify [OPTION]... [PATH]...
+Merge duplicate files.
+
+If no paths are specified as argument, they are read from stdin, one path per
+line, unless -0 is used, in which case the paths are terminated by null
+character.
+
+Options:
+  -?
+  -h, --help                Shows this message.
+
+  -0                        Input items are terminated by a null character
+                            instead of by newlines.
+  -v                        Increase verbose level (may be used more than once).
+
+Desition
+
+  -m <timespec>
+  --minage <timespec>
+                            Don't process files "younger" than <timespec>.
+                            Where <timespec> must have this format:
+                            [0-9]+ [s|m|h|d|w|M|Y]
+                            Examples:
+                                 --minage 5m    # 5 minutes
+                                 --minage 1     # 1 second
+                                 --minage 2w    # 2 weeks
+                            Don't process files younger than 5 minutes.
+                            NOTE: neither daylight saving changes nor leap
+                            years are considered. 'm' stands for 30 days, not
+                            actual months.
+
+
+  -e=size,mtime,...         Comma separated list of values to use for 
+  --eval=size,mtime,...     deciding when two files are unique.
+
+  Available conditions:
+      These check only the stat(2) of the file (fast):
+    --eval=dev                Device number containing the filea (forced when
+                              --hard-link is used).
+    --eval=size               File size
+    --eval=mtime              Modification time
+    --eval=user               User
+    --eval=group              Group
+    --eval=perms              Permissions (The "-rw-rw-r--" column in "ls -l"
+                              output).
+    --eval=basename           a checksum + length of the basename of the file.
+  
+      These inspect the content of the file (may be slow):
+    --eval=md5[:N]            md5 of the content.
+    --eval=sha1[:N]           sha1 of the content.
+    --eval=sha224[:N]         sha224 of the content.
+    --eval=sha256[:N]         sha256 of the content.
+    --eval=sha384[:N]         sha384 of the content.
+    --eval=sha512[:N]         sha512 of the content.
+    --eval=ripemd160[:N]      ripemd160 of the content.
+                              The optional ":N" stands for generating the
+                              digest of only the first N bytes.
+
+  Examples:
+    --eval=size,user,group,perms,sha1:4096 --eval=sha1,sha512
+                              This will run in 2 steps:
+                              The first run will consider duplicate files the
+                              ones that have the same size, owner (user and
+                              group), permissions, and the sha1 digest of the
+                              first 4096 bytes.
+                              The second pass, will run only for files that
+                              have the same "signature" from the first pass,
+                              and will calculate the sha1 and sha512 of all
+                              those that match (full contents of those files).
+                              If they have the same signature from both steps,
+                              they will be merged (according to the "Merging"
+                              policy, see below).
+
+Merging
+
+  -H, --hard-link             Merge the files by creating a hard link.
+
+  -L, --symbolic-link         Merge the files by creating a symbolic link.
+
+  -o file
+  --show-merge file
+                              List the groups of files that will be merged,
+                              one file per line; and groups of files are
+                              separated by an empty line.
+                              Note: the merging will still occur, unless
+                              --dry-run is specified.
+
+  -O file
+  --show-merge-0 file
+                              Report what can be merged, using NUL '\0' char
+                              instead of NL ('\n').
+                              Note: the merging will still occur, unless
+                              --dry-run is specified.
+
+Read mechanism:
+  -R (read|mmap)[:size]     
+  --read (read|mmap)[:size]
+                              Use mmap(2) or read(2), and specify an optional
+                              buffer size.
+                              This is used when a digest (sha1, sha512, etc) on
+                              the contents of a file.
+                              Default: mmap,16M
+
+Scheduling:
+  -c group
+  --cgroup cgroup
+                              Place the current task in the specified cgroup.
+                              Can be specified multiple times.
+                              Example:
+                                 --cgroup /sys/fs/cgroup/blkio/user
+
+  -i class[,data]
+  --ionice class[,data]
+                              Sets (if supported) the ionice priority.
+                              See ionice(1) manpage for details.
+                              Valid values for class:
+                                      none
+                                      real-time rt
+                                      best-effort be
+                                      idle
+                              If class is real-time or best-effort, then data
+                              may be specified and have a value between 0 and 7.
+                              You will normally want: --ionice idle
+
+
+
+Defaults:
+  --eval=size,perms,user,group
+  --eval=sha1:4096
+  --eval=sha512
+  --read=mmap,16777216
+  --hard-link
+
+Report filededup bugs to <https://github.com/garana/mod_reslog/issues>
+Main source: <https://github.com/garana/filededup/>
+
