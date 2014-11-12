@@ -22,6 +22,7 @@ Which are the possible critera? They are actually configurable (See "filededup -
 The main idea is to detect duplicate files with the least possible amount of work.
 
 By default, the processing is done like this:
+
 1. All the files are grouped in clusters, where each cluster contains all the files that share all these:
   * size
   * perms
