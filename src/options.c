@@ -247,7 +247,11 @@ void parse_options(int argc, char* argv[]) { // {{{
 	discriminantv_post_parse(cfg->discriminantv, cfg->discriminantc);
 
 	if (cfg->report_file) {
-		cfg->report_fd = open(cfg->report_file, O_CREAT | O_RDWR | O_TRUNC, 0640);
+		if (!strcmp(cfg->report_file, "-"))
+			cfg->report_fd = 0;
+		else
+			cfg->report_fd = open(cfg->report_file, O_CREAT | O_RDWR | O_TRUNC, 0640);
+
 		if (cfg->report_fd < 0)
 			fatal("Could not open file %s: %s.\n", cfg->report_file, strerror(errno));
 	}

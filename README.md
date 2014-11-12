@@ -47,3 +47,12 @@ Run
 
 And you should have filededup.
 
+## Quick usage:
+
+> filededup --dry-run --show-merge - /some/path
+Lists the files that would be merged, each group of files separated by a white line.
+
+See the output of
+> filededup -h
+for more information.
+
