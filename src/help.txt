@@ -87,8 +87,8 @@ Merging
 
   -O file
   --show-merge-0 file
-                              Report what can be merged, using NUL '\0' char
-                              instead of NL ('\n').
+                              Report what can be merged, using NUL '\\0' char
+                              instead of NL ('\\n').
                               Note: the merging will still occur, unless
                               --dry-run is specified.
 
